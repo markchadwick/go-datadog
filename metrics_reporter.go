@@ -80,6 +80,7 @@ func (mr *MetricsReporter) series(t int64, name string, i interface{}) []*Series
 
 func (mr *MetricsReporter) counterSeries(t int64, name string,
 	counter metrics.Counter) []*Series {
+	counter.Inc(0)
 	return []*Series{
 		mr.counterI(name+".count", t, counter.Count()),
 	}
@@ -112,7 +113,7 @@ func (mr *MetricsReporter) histogramSeries(t int64, name string,
 
 func (mr *MetricsReporter) meterSeries(t int64, name string,
 	m metrics.Meter) []*Series {
-
+	m.Mark(0)
 	return []*Series{
 		mr.counterI(name+".count", t, m.Count()),
 		mr.counterF(name+".rate.1min", t, m.Rate1()),
