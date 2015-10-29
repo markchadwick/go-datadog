@@ -155,3 +155,21 @@ func (_ *ReporterSuite) TestTimerSeries(c *C) {
 
 	c.Check(series[2].Metric, Equals, "my.timer.max")
 }
+
+func (_ *ReporterSuite) TestTaggedCounterSeries(c *C) {
+	counter := metrics.NewCounter()
+	counter.Inc(444)
+	counter.Inc(222)
+	series := reporter.series(
+		t.Unix(), "my.counter[food:bagels,drink:coffee]", counter)
+	c.Check(series, HasLen, 1)
+	s := series[0]
+	c.Check(s.Metric, Equals, "my.counter.count")
+	c.Check(s.Type, Equals, "counter")
+	c.Check(s.Points, HasLen, 1)
+	c.Check(s.Points[0][0], Equals, t.Unix())
+	c.Check(s.Points[0][1], Equals, int64(666))
+	c.Check(s.Tags, HasLen, 2)
+	c.Check(s.Tags[0], Equals, "food:bagels")
+	c.Check(s.Tags[1], Equals, "drink:coffee")
+}
